@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Downstream Usage Errors in GTEx Data — by Resource</title>
+<title>GTEx Data: Producer Errors vs Consumer Traps, by Resource</title>
 <style>
 :root{--bg:#ffffff;--panel:#f7f9fb;--ink:#1f2933;--mut:#5b6b7b;--accent:#2f6f8f;
 --line:#e2e8ef;--viol:#9d3b3b;--caut:#a06a2c;--note:#3a6f8f;--mono:#eef2f6;--ok:#3f7d57}
@@ -13,178 +13,202 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 header{border-bottom:1px solid var(--line);background:var(--panel)}
 header .wrap{padding:46px 24px 34px}
 .kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
-h1{font-size:31px;line-height:1.25;margin:10px 0 8px;letter-spacing:-.01em}
-.abstract{font-size:15.5px;color:#33414e;max-width:730px;margin:14px 0 0}
-.figs{display:flex;flex-wrap:wrap;gap:28px;margin:26px 0 2px}
+h1{font-size:30px;line-height:1.25;margin:10px 0 8px;letter-spacing:-.01em}
+.abstract{font-size:15.5px;color:#33414e;max-width:740px;margin:14px 0 0}
+.def{max-width:740px;margin:14px 0 0;font-size:14px;color:#33414e}
+.def b{color:#16212b}
+.figs{display:flex;flex-wrap:wrap;gap:28px;margin:24px 0 2px}
 .fig b{font-size:23px;font-family:Georgia,serif;display:block;line-height:1.1}
 .fig span{font-size:12.5px;color:var(--mut)}
 section{padding:30px 0;border-bottom:1px solid var(--line)}
-h2{font-size:15px;margin:0 0 14px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.shead{font-size:15px;margin:0 0 4px;color:#16212b;text-transform:uppercase;letter-spacing:.05em}
+.slead{color:var(--mut);margin:2px 0 14px;font-size:14px;max-width:730px}
 .res{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:5px;
-padding:14px 16px;margin:14px 0;background:#fcfdfe}
-.res.star{border-left-color:var(--viol)}
-.res.caut{border-left-color:var(--caut)}
-.res h3{font-size:17px;margin:0}
+padding:14px 16px;margin:13px 0;background:#fcfdfe}
+.res.prod{border-left-color:var(--viol)}
+.res.cons{border-left-color:var(--caut)}
+.res h3{font-size:16.5px;margin:0}
 .res .what{color:var(--mut);font-size:13px;margin:3px 0 0}
 .res .err{margin:11px 0 0;padding-top:10px;border-top:1px dotted var(--line)}
 .res .err:first-of-type{border-top:none;padding-top:2px}
 .res .err p{margin:5px 0 0;font-size:14.5px;color:#33414e}
+.res .da{font-size:13px;color:var(--mut);margin-top:5px}
+.res .da b{color:#16212b;font-weight:600}
 .res .src{margin-top:6px;font-size:12.5px}
 .tags{margin-top:2px}
 .tag{display:inline-block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
 padding:2px 7px;border-radius:3px;border:1px solid var(--line);color:var(--mut);margin:0 6px 0 0}
+.tag.prod{color:var(--viol);border-color:#e0c4c4;background:#fbf0f0}
+.tag.cons{color:var(--caut);border-color:#e4d4bc;background:#fbf6ec}
 .tag.trap{color:var(--note);border-color:#c8dbe6}
-.tag.star{color:#7a5b1e;border-color:#e4d4bc;background:#fbf6ec}
-.tag.ok{color:var(--ok);border-color:#bcd8c6}
-.tag.caut{color:var(--caut);border-color:#e4d4bc}
+.tag.star{color:#7a5b1e;border-color:#e4d4bc}
 code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--mono);padding:1px 5px;border-radius:4px}
 .nav{font-size:13px;margin-top:14px}
 .note-box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;font-size:14px;color:#33414e}
 footer{padding:30px 0 50px;color:var(--mut);font-size:12.5px}
-@media(max-width:680px){h1{font-size:25px}}
+@media(max-width:680px){h1{font-size:24px}}
 </style></head><body>
 <header><div class="wrap">
-  <div class="kicker">Downstream consumers of GTEx data &middot; one section per resource</div>
-  <h1>Downstream Usage Errors in GTEx Data</h1>
+  <div class="kicker">GTEx downstream consumers &middot; classified by failure type</div>
+  <h1>GTEx Data: Producer Errors vs Consumer Traps</h1>
   <p class="abstract">Organised <strong>by downstream resource</strong> &mdash; each tool, database, or package
-  that consumes GTEx data, and the confirmed error(s) it incurs from the data's structural traps (duplicate
-  gene identifiers, a gene symbol that is not a unique key, a median that is not the sum of its isoforms,
-  cross-mapping reads, contamination, and pipeline-dependent values). Every entry was re-verified against its
-  primary source; weakened or rejected entries are shown openly in the closing note.</p>
+  that consumes GTEx data &mdash; and split by a strict test for what counts as an <em>error</em>.</p>
+  <p class="def">
+    <b>Producer error</b> &mdash; the value <em>declares A but delivers B</em>: the resource's own output violates
+    what it claims (a mislabeled field, a contaminated measurement, duplicated rows).<br>
+    <b>Consumer trap</b> &mdash; the value is <em>correct and correctly labeled</em>, but easy to misread; the
+    failure appears only when a consumer assumes it means something cleaner than it does.
+  </p>
   <div class="figs">
-    <div class="fig"><b>9</b><span>downstream resources</span></div>
-    <div class="fig"><b>3</b><span>literature-wide</span></div>
-    <div class="fig"><b>1</b><span>candidate rejected on review</span></div>
+    <div class="fig"><b>5</b><span>producer errors</span></div>
+    <div class="fig"><b>5</b><span>consumer traps</span></div>
+    <div class="fig"><b>9</b><span>resources</span></div>
   </div>
   <p class="nav"><a href="index.html">SampleAttributes &amp; SubjectPhenotypes report</a> &middot;
   <a href="median_tpm.html">Gene median-TPM matrix report</a></p>
 </div></header>
 
 <section><div class="wrap">
-  <h2>Resources whose own outputs carry the error</h2>
+  <p class="shead">Producer errors &mdash; declared &ne; delivered</p>
+  <p class="slead">The resource's output does not mean what it claims. These are errors in the strict sense.</p>
 
-  <div class="res star">
+  <div class="res prod">
     <h3>GTEx eQTL outputs &amp; trans-eQTL / co-expression consumers</h3>
-    <p class="what">The GTEx project's released eQTL associations, and any study built on its trans-eQTL or co-expression calls.</p>
-    <div class="err"><div class="tags"><span class="tag star">literature-wide</span><span class="tag trap">cross-mapping</span></div>
-      <p>Up to <strong>~75% of standard <em>trans</em>-eQTLs are alignment artifacts</strong>: reads from one
-      gene mis-map to a sequence-similar gene. In GTEx, <strong>75.14%</strong> of significant <em>trans</em>-eQTLs
-      were cross-mappable and <strong>90.8&ndash;97.3%</strong> of the top-1000 per tissue (vs 19.1&ndash;25.6%
-      background). The consortium later added a cross-mappability filter; segmental-duplication mismapping still
-      leaks through (2025).</p>
+    <p class="what">GTEx's released eQTL associations and studies built on its trans / co-expression calls.</p>
+    <div class="err"><div class="tags"><span class="tag prod">producer error</span><span class="tag star">literature-wide</span><span class="tag trap">cross-mapping</span></div>
+      <p>Reads from one gene mis-map to a sequence-similar gene, so a distant gene's <em>measured</em> count is
+      contaminated. A real cis-eQTL of the look-alike then surfaces as a fake <em>trans</em>-eQTL:
+      <strong>75.14%</strong> of significant trans-eQTLs were cross-mappable, <strong>90.8&ndash;97.3%</strong> of
+      the top-1000 per tissue (vs 19.1&ndash;25.6% background).</p>
+      <p class="da"><b>Declared</b> &ldquo;genotype effect on gene B's expression&rdquo; &middot; <b>delivered</b>
+      genotype effect on B's count = B + reads leaked from gene A.</p>
       <p class="src">Saha &amp; Battle, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6305209/">F1000Research 2018</a>;
       <a href="https://www.biorxiv.org/content/10.1101/2025.10.08.681258">bioRxiv 2025.10.08.681258</a>.</p></div>
-    <div class="err"><div class="tags"><span class="tag star">literature-wide</span><span class="tag trap">contamination</span></div>
-      <p>Low-level RNA contamination (~40% of samples) gives pancreas genes (PRSS1, PNLIP, CELA3A, CLPS&hellip;)
-      apparent eQTLs in tissues that don't express them &mdash; <strong>31 of 72 tissues carried &ldquo;inappropriate&rdquo;
-      eQTLs</strong>. A PRSS1/PNLIP eQTL in brain or blood is a same-sequencing-day artifact.</p>
+    <div class="err"><div class="tags"><span class="tag prod">producer error</span><span class="tag star">literature-wide</span><span class="tag trap">contamination</span></div>
+      <p>~40% of samples carry low-level RNA contamination; pancreas genes (PRSS1, PNLIP&hellip;) get apparent
+      eQTLs in tissues that don't express them &mdash; <strong>31 of 72 tissues</strong> with &ldquo;inappropriate&rdquo; eQTLs.</p>
+      <p class="da"><b>Declared</b> &ldquo;expression of gene X in tissue Y&rdquo; &middot; <b>delivered</b>
+      tissue Y + same-sequencing-day contamination.</p>
       <p class="src">Halushka et al., <a href="https://www.nature.com/articles/s41467-020-15821-9">Nature Communications 2020</a>.</p></div>
   </div>
 
-  <div class="res star">
-    <h3>Reprocessed expression mirrors &mdash; UCSC Xena/Toil, Recount2/3, GDC, ARCHS4, MSKCC, Piccolo</h3>
-    <p class="what">Resources that re-align GTEx raw reads and republish gene-level expression for general use.</p>
-    <div class="err"><div class="tags"><span class="tag star">literature-wide</span><span class="tag trap">pipeline divergence</span></div>
-      <p>The same GTEx samples give <strong>discordant TPM across pipelines: 2,068 genes (12.36%) differ by
-      &gt;4-fold</strong>. The mirror you download materially changes gene-level conclusions; &ldquo;the GTEx TPM&rdquo;
-      is not a single number. ARCHS4 specifically re-aligns GTEx and diverges from other sources.</p>
-      <p class="src">Arora et al., <a href="https://www.nature.com/articles/s41598-020-59516-z">Scientific Reports 2020</a> /
-      <a href="https://github.com/sonali-bioc/UncertaintyRNA">UncertaintyRNA</a>; <a href="https://maayanlab.cloud/archs4/">ARCHS4</a>.</p></div>
-    <div class="err"><div class="tags"><span class="tag ok">confirmed</span><span class="tag trap">access plumbing</span></div>
-      <p>recount3's GTEx bigwig download URLs were malformed (<code>locate_url</code>), breaking programmatic access.</p>
-      <p class="src"><a href="https://github.com/LieberInstitute/recount3/issues/21">LieberInstitute/recount3 #21</a>.</p></div>
-  </div>
-
-  <div class="res caut">
-    <h3>GTEx Portal visualization &mdash; <code>broadinstitute/gtex-viz</code></h3>
-    <p class="what">GTEx's own web visualization of gene- and transcript-level expression.</p>
-    <div class="err"><div class="tags"><span class="tag ok">confirmed</span><span class="tag trap">aggregation semantics</span></div>
-      <p>Gene-level median TPM is <strong>not</strong> the sum of its isoforms: for <code>SELL</code> in Whole
-      Blood the gene value is <strong>1349 TPM</strong> while six isoforms sum to <strong>500.96</strong> (2.7&times;).
-      The gene value is a <em>median</em> (RNA-SeQC); transcripts are <em>means</em> (RSEM). The file is not composable from isoforms.</p>
-      <p class="src"><a href="https://github.com/broadinstitute/gtex-viz/issues/207">broadinstitute/gtex-viz #207</a>.</p></div>
-  </div>
-
-  <div class="res caut">
+  <div class="res prod">
     <h3>eQTL Catalogue (EMBL-EBI)</h3>
-    <p class="what">Harmonised eQTL summary statistics across studies, including GTEx, for colocalization.</p>
-    <div class="err"><div class="tags"><span class="tag ok">confirmed</span><span class="tag trap">data-quality</span></div>
-      <p>In release 3 (Oct 2020) the <code>AC</code> and <code>AN</code> fields were <strong>swapped</strong>;
-      analyses that used <code>AN</code> to infer sample size had reduced power to detect colocalizations.</p>
+    <p class="what">Harmonised eQTL summary statistics across studies, including GTEx.</p>
+    <div class="err"><div class="tags"><span class="tag prod">producer error</span><span class="tag trap">mislabeled field</span></div>
+      <p>In release 3 (Oct 2020) the <code>AC</code> and <code>AN</code> columns were swapped; analyses using
+      <code>AN</code> to infer sample size lost colocalization power.</p>
+      <p class="da"><b>Declared</b> column = allele number &middot; <b>delivered</b> allele count.</p>
       <p class="src"><a href="https://www.ebi.ac.uk/eqtl/Release_notes/">eQTL Catalogue release notes</a>.</p></div>
   </div>
-</div></section>
 
-<section><div class="wrap">
-  <h2>Application tools &amp; packages that consume GTEx</h2>
-
-  <div class="res caut">
-    <h3>GEPIA &mdash; cancer/normal expression web server</h3>
-    <p class="what">Compares TCGA tumor vs GTEx normal expression for differential analysis (heavily cited).</p>
-    <div class="err"><div class="tags"><span class="tag caut">weakened</span><span class="tag trap">batch confound</span></div>
-      <p>Tumor (TCGA) vs normal (GTEx) is a nested design. GEPIA reprocesses both through UCSC Xena/Toil to
-      <em>mitigate</em> the batch confound &mdash; so it is a <strong>residual</strong> effect, not the
-      uncorrectable one first stated &mdash; but a TCGA-vs-GTEx batch component persists, so calls still warrant
-      independent validation.</p>
-      <p class="src"><a href="http://gepia.cancer-pku.cn/">GEPIA</a>; residual-batch caveat per Arora et al. 2020.</p></div>
-  </div>
-
-  <div class="res caut">
+  <div class="res prod">
     <h3>Signac &mdash; single-cell ATAC-seq (Stuart/Satija lab)</h3>
-    <p class="what">Companion to Seurat; <code>GeneActivity()</code> maps accessibility to genes.</p>
-    <div class="err"><div class="tags"><span class="tag ok">confirmed</span><span class="tag trap">duplicate IDs</span></div>
-      <p>Pseudoautosomal (<code>_PAR_Y</code>) genes carry a duplicate ID, so <code>GeneActivity()</code>
-      produced a matrix with <strong>36,588 rows but 36,559 unique names &mdash; 29 PAR genes duplicated</strong>,
-      fanning out downstream sums/joins.</p>
+    <p class="what">Companion to Seurat; <code>GeneActivity()</code> builds a gene&times;cell matrix.</p>
+    <div class="err"><div class="tags"><span class="tag prod">producer error</span><span class="tag trap">duplicate IDs</span></div>
+      <p>Pseudoautosomal (<code>_PAR_Y</code>) genes carry a duplicate ID, so the matrix had
+      <strong>36,588 rows but only 36,559 unique gene names &mdash; 29 duplicated</strong>.</p>
+      <p class="da"><b>Declared</b> &ldquo;matrix of unique gene features&rdquo; &middot; <b>delivered</b> duplicated rows.</p>
       <p class="src"><a href="https://github.com/timoast/signac/issues/521">timoast/signac #521</a>.</p></div>
   </div>
 
-  <div class="res caut">
-    <h3>PheKnowLator &mdash; biomedical knowledge graph</h3>
-    <p class="what">Ingests GTEx median TPM to build gene&ndash;tissue expression edges.</p>
-    <div class="err"><div class="tags"><span class="tag ok">confirmed</span><span class="tag trap">non-unique key</span></div>
-      <p>Because a gene symbol maps to many gene IDs (in this matrix <strong>199 symbols &rarr; multiple Ensembl
-      IDs</strong>), the pipeline must deduplicate symbols by hand (e.g. HLA-DQA2) or emit colliding/duplicated edges.</p>
-      <p class="src"><a href="https://github.com/callahantiff/PheKnowLator">callahantiff/PheKnowLator</a>.</p></div>
+  <div class="res prod">
+    <h3>recount3 &mdash; reprocessed RNA-seq resource</h3>
+    <p class="what">Bioconductor access to reprocessed GTEx coverage/expression.</p>
+    <div class="err"><div class="tags"><span class="tag prod">producer error</span><span class="tag trap">broken access</span></div>
+      <p>GTEx bigwig download URLs were malformed (<code>locate_url</code>), so the advertised files did not resolve.</p>
+      <p class="da"><b>Declared</b> a working download URL &middot; <b>delivered</b> a 404.</p>
+      <p class="src"><a href="https://github.com/LieberInstitute/recount3/issues/21">LieberInstitute/recount3 #21</a>.</p></div>
   </div>
 
-  <div class="res caut">
-    <h3>grex &mdash; GTEx gene-ID mapping R package</h3>
-    <p class="what">Maps GTEx Ensembl IDs to symbols/Entrez for annotation.</p>
-    <div class="err"><div class="tags"><span class="tag ok">confirmed</span><span class="tag trap">non-unique key</span></div>
-      <p>Hundreds of cases where one Ensembl ID maps to multiple Entrez IDs; grex keeps only the first and warns
-      its mapping <strong>&ldquo;may not be 100% accurate&rdquo;</strong> &mdash; a documented, lossy collapse.</p>
-      <p class="src"><a href="https://cran.r-project.org/web/packages/grex/vignettes/grex.html">grex vignette</a>.</p></div>
-  </div>
-
-  <div class="res caut">
+  <div class="res prod">
     <h3>SuSiE GTEx preprocessing (Stephens Lab)</h3>
     <p class="what">Prepares GTEx genes/associations for statistical fine-mapping.</p>
-    <div class="err"><div class="tags"><span class="tag caut">unguarded</span><span class="tag trap">duplicate IDs</span></div>
+    <div class="err"><div class="tags"><span class="tag prod">latent</span><span class="tag trap">duplicate IDs</span></div>
       <p>Gene extraction is <code>sort -u</code> by gene ID only, with no chromosome-aware handling, so
-      <code>_PAR_Y</code> duplicate IDs pass through unfiltered.</p>
+      <code>_PAR_Y</code> duplicate IDs pass through &mdash; a latent producer error in the prepared gene set.</p>
+      <p class="da"><b>Declared</b> &ldquo;unique gene list&rdquo; &middot; <b>delivered</b> set still containing PAR duplicates.</p>
       <p class="src"><a href="https://stephenslab.github.io/susie-paper/manuscript_results/GTEx_Association_Preprocessing.html">SuSiE GTEx preprocessing</a>.</p></div>
   </div>
 </div></section>
 
 <section><div class="wrap">
-  <h2>Method &amp; transparency</h2>
+  <p class="shead">Consumer traps &mdash; correct value, easy to misread</p>
+  <p class="slead">The resource does exactly what it declares. The failure is the consumer's assumption, not the producer's output.</p>
+
+  <div class="res cons">
+    <h3>GTEx gene median-TPM file / Portal viz (<code>gtex-viz</code>)</h3>
+    <p class="what">The curated per-tissue median-TPM matrix and its visualization.</p>
+    <div class="err"><div class="tags"><span class="tag cons">consumer trap</span><span class="tag trap">aggregation semantics</span></div>
+      <p>For <code>SELL</code> in Whole Blood the gene value is <strong>1349 TPM</strong> while six isoforms sum to
+      <strong>500.96</strong> (2.7&times;). Both numbers are correct and correctly labeled &mdash; gene is a
+      <em>median</em> (RNA-SeQC), transcripts are <em>means</em> (RSEM). The trap is assuming gene = &Sigma; isoforms.</p>
+      <p class="da">Declared &ldquo;median&rdquo;; it <em>is</em> the median. Only the reader's &ldquo;= sum of isoforms&rdquo; assumption fails.</p>
+      <p class="src"><a href="https://github.com/broadinstitute/gtex-viz/issues/207">broadinstitute/gtex-viz #207</a>.</p></div>
+  </div>
+
+  <div class="res cons">
+    <h3>Reprocessed expression mirrors &mdash; Xena/Toil, Recount2, GDC, ARCHS4, MSKCC, Piccolo</h3>
+    <p class="what">Resources that each re-align GTEx and republish gene-level expression.</p>
+    <div class="err"><div class="tags"><span class="tag cons">consumer trap</span><span class="tag star">literature-wide</span><span class="tag trap">non-comparability</span></div>
+      <p>The same samples give discordant TPM across pipelines &mdash; <strong>2,068 genes (12.36%) differ &gt;4-fold</strong>.
+      Each pipeline's TPM is correct under its own method; they are simply not interchangeable. The trap is treating
+      &ldquo;the GTEx TPM&rdquo; as one canonical number.</p>
+      <p class="da">Each mirror delivers a valid TPM; none declares cross-pipeline equivalence. The error is assuming they match.</p>
+      <p class="src">Arora et al., <a href="https://www.nature.com/articles/s41598-020-59516-z">Scientific Reports 2020</a> /
+      <a href="https://github.com/sonali-bioc/UncertaintyRNA">UncertaintyRNA</a>; <a href="https://maayanlab.cloud/archs4/">ARCHS4</a>.</p></div>
+  </div>
+
+  <div class="res cons">
+    <h3>GEPIA &mdash; cancer/normal expression web server</h3>
+    <p class="what">Compares TCGA tumor vs GTEx normal expression for differential analysis.</p>
+    <div class="err"><div class="tags"><span class="tag cons">consumer trap</span><span class="tag trap">residual batch</span></div>
+      <p>GEPIA reprocesses both sides through UCSC Xena/Toil to mitigate batch, and says so. A <em>residual</em>
+      TCGA-vs-GTEx batch component remains, so tumor-vs-normal calls warrant validation &mdash; but GEPIA does not
+      hide it. (Originally I overstated this as &ldquo;uncorrectable&rdquo;.)</p>
+      <p class="da">Disclosed reprocessing + residual caveat; not a hidden declared&ne;delivered.</p>
+      <p class="src"><a href="http://gepia.cancer-pku.cn/">GEPIA</a>; residual-batch caveat per Arora et al. 2020.</p></div>
+  </div>
+
+  <div class="res cons">
+    <h3>grex &mdash; GTEx gene-ID mapping R package</h3>
+    <p class="what">Maps GTEx Ensembl IDs to symbols/Entrez.</p>
+    <div class="err"><div class="tags"><span class="tag cons">consumer trap</span><span class="tag trap">non-unique key</span></div>
+      <p>Hundreds of one-Ensembl&rarr;many-Entrez cases; grex keeps the first and <strong>explicitly warns its mapping
+      &ldquo;may not be 100% accurate&rdquo;</strong>. Disclosed lossiness &mdash; the trap is a consumer ignoring the warning.</p>
+      <p class="da">Declared lossy keep-first behaviour; it does exactly that.</p>
+      <p class="src"><a href="https://cran.r-project.org/web/packages/grex/vignettes/grex.html">grex vignette</a>.</p></div>
+  </div>
+
+  <div class="res cons">
+    <h3>PheKnowLator &mdash; biomedical knowledge graph</h3>
+    <p class="what">Ingests GTEx median TPM to build gene&ndash;tissue edges.</p>
+    <div class="err"><div class="tags"><span class="tag cons">trap (mitigated)</span><span class="tag trap">non-unique key</span></div>
+      <p>A gene symbol maps to many IDs (in this matrix <strong>199 symbols &rarr; multiple Ensembl IDs</strong>).
+      PheKnowLator <em>correctly deduplicates</em> symbols (e.g. HLA-DQA2) &mdash; included as evidence the trap is
+      real and that careful consumers handle it, not as an error PheKnowLator made.</p>
+      <p class="da">Encountered the symbol-key trap and mitigated it; no error.</p>
+      <p class="src"><a href="https://github.com/callahantiff/PheKnowLator">callahantiff/PheKnowLator</a>.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="shead">Method &amp; transparency</p>
   <div class="note-box">
-  <p style="margin:0 0 8px"><strong>Verification.</strong> Each error was checked against its primary source and
-  the numbers quoted from the original. Quantitative claims (75.14%; 90.8&ndash;97.3%; 12.36% / &gt;4-fold;
-  31 of 72 tissues; 1349 vs 501 TPM; 36,588 vs 36,559 rows; AC/AN swap) reproduce exactly.</p>
-  <p style="margin:0 0 8px"><strong>Rejected.</strong> A retracted lung-adenocarcinoma expression-mining paper
-  was investigated and <em>excluded</em>: its retraction cites systematic publication-process manipulation and
-  peer-review integrity, not a GTEx/TCGA data error.</p>
-  <p style="margin:0"><strong>Weakened.</strong> GEPIA's confound was downgraded from &ldquo;uncorrectable&rdquo;
-  to &ldquo;residual&rdquo; after confirming its uniform reprocessing; ARCHS4 is listed under the reprocessed
-  mirrors as corroborating. The shared pattern across every resource: it treated a GTEx identifier or value as
-  cleaner than it is &mdash; duplicate IDs, a symbol as a key, cross-mapping reads, contamination, pipeline-variant
-  values, or a median mistaken for a sum.</p>
+  <p style="margin:0 0 8px"><strong>The test.</strong> An entry is a <em>producer error</em> only if the value
+  declares one thing and delivers another (mislabeled field, contaminated measurement, duplicated rows). If the
+  value is correct and correctly labeled, it is a <em>consumer trap</em>, not an error &mdash; the failure lives
+  in the reader's assumption. Reclassifying the catalogue this way moved gtex-viz #207, pipeline-variability, GEPIA,
+  grex, and PheKnowLator out of &ldquo;errors&rdquo; and into &ldquo;traps&rdquo;.</p>
+  <p style="margin:0 0 8px"><strong>Verification.</strong> Numbers were quoted from primary sources and reproduce
+  exactly (75.14%; 90.8&ndash;97.3% vs 19.1&ndash;25.6%; 12.36% / &gt;4-fold; 31 of 72 tissues; 1349 vs 501 TPM;
+  36,588 vs 36,559 rows; AC/AN swap).</p>
+  <p style="margin:0"><strong>Rejected.</strong> A retracted lung-adenocarcinoma expression-mining paper was
+  excluded &mdash; retracted for publication-process/peer-review integrity, not a GTEx data error.</p>
   </div>
 </div></section>
 
 <footer><div class="wrap">
   Companion to an automated LLM-agent semantic-profiling pipeline over GTEx v8. External findings are attributed
-  to their authors; links point to the primary sources. Re-verified June 2026.
+  to their authors; links point to primary sources. Re-verified June 2026.
 </div></footer></body></html>
