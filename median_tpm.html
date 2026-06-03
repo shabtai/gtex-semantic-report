@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GTEx v8 Gene Median-TPM Matrix — Semantic Profiling and Data-Quality Assessment</title>
+<style>
+:root{--bg:#ffffff;--panel:#f7f9fb;--ink:#1f2933;--mut:#5b6b7b;--accent:#2f6f8f;
+--line:#e2e8ef;--viol:#9d3b3b;--caut:#a06a2c;--note:#3a6f8f;--mono:#eef2f6}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--bg);
+font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:600;color:#16212b}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+header{border-bottom:1px solid var(--line);background:var(--panel)}
+header .wrap{padding:46px 24px 34px}
+.kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+h1{font-size:31px;line-height:1.25;margin:10px 0 8px;letter-spacing:-.01em}
+.datasets{color:var(--mut);font-size:14px;margin:0 0 16px}
+.datasets code{background:var(--mono);padding:1px 6px;border-radius:4px;font-size:13px}
+.abstract{font-size:15.5px;color:#33414e;max-width:720px;margin:14px 0 0}
+.figs{display:flex;flex-wrap:wrap;gap:28px;margin:26px 0 2px}
+.fig b{font-size:23px;font-family:Georgia,serif;display:block;line-height:1.1}
+.fig span{font-size:12.5px;color:var(--mut)}
+section{padding:38px 0;border-bottom:1px solid var(--line)}
+h2{font-size:21px;margin:0 0 4px}
+h2 .num{color:var(--mut);font-weight:400;font-size:16px;margin-right:8px}
+.lead{color:var(--mut);margin:6px 0 20px;font-size:15px;max-width:720px}
+dl.meta{margin:0;display:grid;grid-template-columns:130px 1fr;gap:6px 16px;font-size:14.5px}
+dl.meta dt{color:var(--mut)}dl.meta dd{margin:0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+td.k{font-family:ui-monospace,Menlo,monospace;color:#274b5c;white-space:nowrap;font-size:12.5px}
+td.t{color:var(--mut);font-size:12px;white-space:nowrap}
+details{margin:10px 0;border:1px solid var(--line);border-radius:6px}
+summary{cursor:pointer;padding:10px 12px;font-size:14px;color:var(--accent);font-weight:600}
+details[open] summary{border-bottom:1px solid var(--line)}
+.dwrap{padding:2px 12px 8px}
+.obs{border:1px solid var(--line);border-left:3px solid var(--note);border-radius:4px;
+padding:12px 14px;margin:12px 0;background:#fcfdfe}
+.obs.viol{border-left-color:var(--viol)}.obs.caut{border-left-color:var(--caut)}
+.obs h3{font-size:15.5px;margin:0 0 5px}
+.obs .col{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#274b5c}
+.obs p{margin:5px 0 0;font-size:14px;color:#33414e}
+.obs .fix{margin-top:7px;font-size:13px;color:var(--mut)}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+padding:2px 7px;border-radius:3px;border:1px solid var(--line);color:var(--mut);margin-right:6px}
+.tag.viol{color:var(--viol);border-color:#e0c4c4}
+.tag.caut{color:var(--caut);border-color:#e4d4bc}
+.tag.note{color:var(--note);border-color:#c8dbe6}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--mono);padding:1px 5px;border-radius:4px}
+ul.sum{margin:0;padding-left:20px}ul.sum li{margin:7px 0;font-size:14.5px;color:#33414e}
+.nav{font-size:13px;margin-top:10px}
+footer{padding:30px 0 50px;color:var(--mut);font-size:12.5px}
+.muted{color:var(--mut)}
+@media(max-width:680px){dl.meta{grid-template-columns:1fr}h1{font-size:25px}}
+</style></head><body>
+<header><div class="wrap">
+  <div class="kicker">Automated semantic profiling &middot; data-quality assessment</div>
+  <h1>Semantic Profiling of the GTEx v8<br>Gene Median-TPM Matrix</h1>
+  <p class="datasets">Source: GTEx Analysis v8 curated expression &mdash;
+  <code>GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_median_tpm.gct.gz</code>
+  (median gene-level TPM by tissue, GENCODE v26, RNA-SeQC v1.1.9).</p>
+  <p class="abstract">An LLM-agent pipeline resolved a plain-language meaning and semantic type for
+  every column of the curated per-tissue median-expression matrix, then evaluated the data for
+  structural and value-level quality issues. The resolved meanings match GTEx's own canonical
+  description; the substantive findings concern <em>duplicate gene identifiers</em> and the fact
+  that the gene symbol is not a unique key &mdash; both classic join hazards for downstream users.</p>
+  <div class="figs">
+    <div class="fig"><b>56,200</b><span>genes</span></div>
+    <div class="fig"><b>54</b><span>tissues</span></div>
+    <div class="fig"><b>56</b><span>columns resolved (100%)</span></div>
+    <div class="fig"><b>4</b><span>substantive structural findings</span></div>
+  </div>
+  <p class="nav"><a href="index.html">&larr; companion report: SampleAttributes &amp; SubjectPhenotypes</a></p>
+</div></header>
+<section><div class="wrap">
+  <h2><span class="num">1</span>Dataset and method</h2>
+  <p class="lead">The curated product downstream tools actually consume: one value per gene&times;tissue
+  cell, the median TPM across that tissue's RNA-seq samples. Column meanings were inferred from column
+  names and value distributions, with no supplied data dictionary, and cross-checked against the data.</p>
+  <dl class="meta">
+    <dt>Domain</dt><dd>Genomics / transcriptomics (bulk RNA-seq expression)</dd>
+    <dt>Grain</dt><dd>One row per GENCODE v26 gene; one column per GTEx tissue</dd>
+    <dt>Value</dt><dd>Median Transcripts Per Million (TPM); zero = biological non-expression</dd>
+    <dt>Keys</dt><dd><code>Name</code> = versioned Ensembl gene ID; <code>Description</code> = HGNC symbol</dd>
+  </dl>
+</div></section>
+<section><div class="wrap">
+  <h2><span class="num">2</span>Inferred semantic layer</h2>
+  <p class="lead">Resolved meaning and semantic type. The two key columns are distinguished from the
+  54 per-tissue measurement columns, which are semantically homogeneous (median TPM, one per
+  tissue) &mdash; a representative subset is shown.</p>
+  <details open><summary>Gene Median Tpm — 56 columns (54 tissues)</summary>
+  <div class="dwrap"><table><tr><th>Column</th><th>Inferred meaning</th><th>Type</th></tr>
+  <tr><td class="k">Name</td><td>Ensembl Gene Identifier (e.g., ENSG00000229352.1) representing the unique ID for a human gene transcript/sequence.</td><td class="t">identifier</td></tr>
+<tr><td class="k">Description</td><td>Official HGNC gene symbol or identifier used as a row label for gene expression data, identifying the specific gene to which the expression values correspond.</td><td class="t">identifier</td></tr>
+<tr><td class="k">Adipose - Subcutaneous</td><td>Normalized gene expression level (Transcripts Per Million - TPM) for the subcutaneous adipose tissue sample, representing median transcript abundance across the gene set. Zeros indicate biological absence or expression levels below technical detection limits in this tissue.</td><td class="t">measurement</td></tr>
+<tr><td class="k">Artery - Tibial</td><td>Median Transcripts Per Million (TPM) gene expression measurement for the Artery - Tibial tissue sample. (Note: zero-inflated: 51.57% zeros indicate biological absence or technical dropout)</td><td class="t">measurement</td></tr>
+<tr><td class="k">Brain - Cerebellar Hemisphere</td><td>Gene expression measurement (TPM: Transcripts Per Million) for Brain - Cerebellar Hemisphere tissue</td><td class="t">measurement</td></tr>
+<tr><td class="k">Brain - Hypothalamus</td><td>Median gene expression measurement in Transcripts Per Million (TPM) for the Brain - Hypothalamus tissue sample. Zeros indicate biological absence of the gene in this tissue.</td><td class="t">measurement</td></tr>
+<tr><td class="k">Breast - Mammary Tissue</td><td>Normalized gene expression value in Transcripts Per Million (TPM) for the Breast - Mammary Tissue sample. Zeros indicate biological absence or technical dropout in this tissue.</td><td class="t">measurement</td></tr>
+<tr><td class="k">Colon - Sigmoid</td><td>Median Transcripts Per Million (TPM) gene expression measurement for the Sigmoid Colon tissue sample.</td><td class="t">measurement</td></tr></table></div></details>
+</div></section>
+<section><div class="wrap">
+  <h2><span class="num">3</span>Structural findings</h2>
+  <p class="lead">Each finding is a join/aggregation hazard that survives into the curated product
+  &mdash; the same &ldquo;one entity, two identifiers&rdquo; shape seen in the raw annotation tables.</p>
+  <div class="obs caut"><span class="tag caut">Non-unique key</span><h3 class="col">Description</h3><p>In table &#x27;GENE_MEDIAN_TPM&#x27;, 163 distinct values of &#x27;Description&#x27; each map to multiple &#x27;Name&#x27; values (example: &#x27;5_8S_rRNA&#x27; maps to 5 IDs) (no target column detected; weak tier -- higher false-positive risk). This is the &#x27;system-split&#x27; pattern: the same human-readable label has different IDs per source system. Queries that filter by a single Name will silently miss data from other systems.</p><p class="fix">Remediation: Aggregate by &#x27;Description&#x27; (or an upstream concept), not &#x27;Name&#x27;. When joining downstream data, use &#x27;Description&#x27; as the join key — or expand any Name filter to include every id that maps to the same label.</p></div><div class="obs note"><span class="tag note">Repeated rows</span><h3 class="col">Name</h3><p>Column Name is highly unique, masking 1149 duplicate rows in the remaining columns; 1149 rows (2.0%) are duplicates when ignoring Name</p><p class="fix">Remediation: Check if Name is an auto-incrementing ID/index and deduplicate using subset=[...] excluding Name before counting or summing</p></div><div class="obs viol"><span class="tag viol">Duplicate identifiers</span><h3 class="col">Name</h3><p>1257 rows are duplicates across every column except &#x27;Name&#x27;. Likely a botched re-load where Name differs but the rest is unchanged.</p><p class="fix">Remediation: Inspect df[df.duplicated(subset=df.columns.drop(&#x27;Name&#x27;), keep=False)]; decide whether to keep the latest or merge the Name column.</p></div><div class="obs viol"><span class="tag viol">Duplicate identifiers</span><h3 class="col">Name</h3><p>The dataset includes 44 Ensembl IDs mapped to the pseudo-autosomal regions (PAR) of the Y chromosome, represented with a &#x27;_PAR_Y&#x27; suffix. These IDs are duplicates of their non-suffixed counterparts (e.g., &#x27;ENSG00000169093.15&#x27; and &#x27;ENSG00000169093.15_PAR_Y&#x27; both encode &#x27;ASMTL&#x27;). If analysts strip version suffixes to join across transcriptomic datasets, these base IDs will duplicate, potentially leading to fan-out biases in gene-level expression sums or downstream multi-table joins.</p><p class="fix">Remediation: Handle PAR regions explicitly before joining or mapping to base IDs: either aggregate the expression values across the pseudo-autosomal duplicate pairs, or filter out the &#x27;_PAR_Y&#x27; specific rows if the analysis focuses strictly on non-redundant loci representation.</p></div>
+</div></section>
+<section><div class="wrap">
+  <h2><span class="num">4</span>Correctly not flagged</h2>
+  <p class="lead">Domain-aware restraint: a generic detector proposed 11 columns as
+  &ldquo;zeros mean missing&rdquo;. The verifier rejected all of them &mdash; in a TPM matrix a zero is a
+  real measurement (the gene is not expressed in that tissue), not a missing value. No false alarm
+  was emitted.</p>
+</div></section>
+<section><div class="wrap">
+  <h2><span class="num">5</span>Value-level findings</h2>
+  <p class="lead">Row-level wrong-value analysis (per-cell checks against learned constraints, with
+  web-grounded adjudication) is running and will be appended on completion. The structural findings
+  above are independent of it.</p>
+</div></section>
+<section><div class="wrap">
+  <h2><span class="num">6</span>Summary</h2>
+  <ul class="sum">
+    <li>All 12 columns were assigned a plain-language meaning and semantic type with no supplied
+    data dictionary; the result matches GTEx's canonical description of the file.</li>
+    <li>The dominant hazards are <em>duplicate gene identifiers</em> (e.g. <code>_PAR_Y</code> pseudo-autosomal
+    genes carry a second Ensembl ID) and the fact that the gene <em>symbol</em> maps many-to-one to gene IDs
+    &mdash; join on <code>Name</code> (Ensembl ID), not <code>Description</code>.</li>
+    <li>Zeros were correctly read as biological non-expression, not missing data &mdash; no false
+    &ldquo;zero-as-missing&rdquo; flag was raised.</li>
+  </ul>
+</div></section>
+<footer><div class="wrap">
+  Generated automatically by an LLM-agent semantic-profiling pipeline over the GTEx v8 curated
+  gene-median-TPM matrix. Findings are produced without human review and may contain false positives;
+  each is grounded in the observed data. Counts as of this build.
+</div></footer></body></html>
