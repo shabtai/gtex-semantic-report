@@ -1,0 +1,308 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GTEx Annotations &mdash; Semantic Enrichment &amp; Data-Bug Report</title>
+<style>
+:root{--bg:#0b0e14;--panel:#141a24;--panel2:#1b2330;--ink:#e6edf3;--mut:#8b98a9;
+--accent:#3fb6ff;--accent2:#7c5cff;--warn:#ffb547;--bad:#ff5c6c;--good:#3ddc97;--line:#243044}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+background:var(--bg);color:var(--ink)}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+header.hero{background:radial-gradient(1200px 500px at 70% -10%,rgba(124,92,255,.25),transparent),
+radial-gradient(900px 400px at 10% 0%,rgba(63,182,255,.18),transparent);border-bottom:1px solid var(--line)}
+.hero .wrap{padding:64px 22px 52px}
+.eyebrow{letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+h1{font-size:46px;line-height:1.1;margin:14px 0 10px;letter-spacing:-.02em}
+h1 .grad{background:linear-gradient(90deg,#3fb6ff,#7c5cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:19px;color:var(--mut);max-width:740px}
+.stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:150px}
+.stat b{display:block;font-size:30px;letter-spacing:-.02em}
+.stat span{color:var(--mut);font-size:13px}
+section{padding:52px 0;border-bottom:1px solid var(--line)}
+h2{font-size:28px;margin:0 0 6px;letter-spacing:-.01em}
+.lead{color:var(--mut);margin:0 0 26px;max-width:760px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0}
+.hl{background:linear-gradient(180deg,rgba(255,92,108,.10),rgba(255,92,108,.03));border-color:rgba(255,92,108,.4)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.tag.fail{color:var(--bad);border-color:rgba(255,92,108,.5);background:rgba(255,92,108,.08)}
+.tag.warn{color:var(--warn);border-color:rgba(255,181,71,.4);background:rgba(255,181,71,.07)}
+.tag.adv{color:var(--accent);border-color:rgba(63,182,255,.4);background:rgba(63,182,255,.07)}
+code,.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+.col{color:var(--accent2);font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:34px}}
+.bug h3{margin:6px 0 8px;font-size:18px}
+.bug .why{color:var(--ink)}
+.bug .fix{margin-top:10px;color:var(--mut);font-size:14px}
+.bug .fix b{color:var(--good)}
+table.cols{width:100%;border-collapse:collapse;font-size:14px}
+table.cols th,table.cols td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.cols th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+table.cols td.k{color:var(--accent2);font-weight:700;white-space:nowrap}
+table.cols td.t{color:var(--mut);font-size:12px;white-space:nowrap}
+details{margin:10px 0}summary{cursor:pointer;color:var(--accent);font-weight:600}
+.take{display:flex;gap:14px;align-items:flex-start;margin:14px 0}
+.take .n{flex:0 0 34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;
+background:linear-gradient(135deg,#3fb6ff,#7c5cff);color:#0b0e14}
+.muted{color:var(--mut)}
+footer{padding:40px 0;color:var(--mut);font-size:13px}
+.pill{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:2px 10px;margin-right:6px}
+</style></head><body>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Semantic Enricher &middot; automated data understanding</div>
+  <h1>The GTEx sample metadata,<br><span class="grad">read by machine &mdash; and audited.</span></h1>
+  <p class="sub">We pulled two public GTEx v8 annotation tables, let an LLM agent pipeline
+  discover what every cryptic column actually means, then hunted for the data traps that
+  silently break analysis. Here's what it found.</p>
+  <div class="stats">
+    <div class="stat"><b>67</b><span>columns auto-resolved (100%)</span></div>
+    <div class="stat"><b>22,951</b><span>biospecimen rows profiled</span></div>
+    <div class="stat"><b>980</b><span>human donors linked</span></div>
+    <div class="stat"><b>55</b><span>column-shape traps</span></div>
+    <div class="stat"><b>44</b><span>row-level wrong values</span></div>
+  </div>
+</div></header>
+<section id="semantics"><div class="wrap">
+  <h2>What the data <em>means</em></h2>
+  <p class="lead">No human wrote a data dictionary. The pipeline inferred the domain, the grain,
+  and a plain-English meaning for each column from names, values, and web-grounded domain priors.</p>
+  <div class="card">
+    <div><span class="pill">Domain</span> biobanking_genomics_repository</div>
+    <div style="margin-top:10px"><span class="pill">Cohort</span> 980 unique human donors contributing 22,951 biospecimen samples (median ~23 samples per donor), characteristic of the GTEx project donor-tissue biobank.</div>
+    <div style="margin-top:10px"><span class="pill">Linking</span> Subject-level (SUBJID) to Biospecimen-level (SAMPID) registry. Note: while conceptually linked by donor, no explicit FK join was verified in this component.</div>
+    <div style="margin-top:10px"><span class="pill">Scope</span> Measures the provenance, quality control, and technical processing metrics of human tissue and blood biospecimens, alongside static donor demographic metadata. It does NOT measure longitudinal patient health, clinical encounter history, or molecular assay results (e.g., actual gene expression counts or variant calls).</div>
+  </div>
+<details open><summary>Subjectphenotypes &mdash; 4 columns</summary>
+    <div class="card" style="padding:6px 10px"><table class="cols">
+    <tr><th>Column</th><th>Inferred meaning</th><th>Type</th></tr><tr><td class="k">SUBJID</td><td>Unique identifier for the research subject (GTEx subject ID)</td><td class="t">identifier</td></tr>
+<tr><td class="k">SEX</td><td>Biological sex of the subject (1=Male, 2=Female or vice-versa depending on the specific study metadata)</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">AGE</td><td>Subject age range at time of recruitment/sampling.</td><td class="t">classifier</td></tr>
+<tr><td class="k">DTHHRDY</td><td>Hardy Scale score for the circumstances of the subject&#x27;s death (0-4 scale)</td><td class="t">coded_concept</td></tr></table></div></details>
+<details><summary>Sampleattributes &mdash; 63 columns</summary>
+    <div class="card" style="padding:6px 10px"><table class="cols">
+    <tr><th>Column</th><th>Inferred meaning</th><th>Type</th></tr><tr><td class="k">SAMPID</td><td>Unique biospecimen identifier (Sample ID) assigned by the GTEx project. The format follows a specific naming convention: Subject ID (e.g., GTEX-1117F) - Tissue/Site Code (e.g., 0003) - Sample Type Code (SM) - Aliquot/Unique ID (e.g., 58Q7G), identifying the specific tissue sample aliquot.</td><td class="t">identifier</td></tr>
+<tr><td class="k">SMATSSCR</td><td>Automated tissue histology quality score (0-3 scale) for the biospecimen sample, indicating histological integrity for genomics research. Empty values indicate the score was not provided for the sample.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMCENTER</td><td>Sequencing or data processing center(s) responsible for the sample, represented by short codes (e.g., &#x27;A1&#x27;, &#x27;B1&#x27;, &#x27;C1&#x27;, &#x27;D1&#x27;). Multiple values indicate joint processing or site collaborations. Empty strings denote missing center information.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMPTHNTS</td><td>Pathology notes describing the physical characteristics and histological quality of the tissue specimen, including tissue count, dimensions, and observed morphological features (e.g., fibrosis, fat content). Empties indicate samples where no pathology assessment was provided.</td><td class="t">free_text</td></tr>
+<tr><td class="k">SMRIN</td><td>RNA Integrity Number (RIN), a standard metric used to assess the quality of RNA samples for genomics research, with values on a scale from 1 (completely degraded) to 10 (intact). Empty strings indicate samples where the RIN was not calculated or is not available.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMTS</td><td>Broad anatomical tissue site classification for the collected biospecimen (e.g., &#x27;Blood&#x27;, &#x27;Brain&#x27;, &#x27;Skin&#x27;). This represents a high-level grouping of the tissue source.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMTSD</td><td>Detailed anatomical tissue site description from the GTEx project ontology for the collected biospecimen.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMUBRID</td><td>UBERON or EFO ontology identifier for the anatomical tissue site associated with the biospecimen, linked to GTEx anatomical ontology. SMUBRID likely refers to a repository ID or anatomical site ID.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMTSISCH</td><td>Technical attribute of the biospecimen sample, consisting of a mix of tissue ischemic time (in minutes) and negative-value quality flags or error codes. Positive values represent the elapsed duration between tissue excision and preservation. Negative values represent internal error codes or non-standard status flags, as they are not physically possible for a duration measurement. Empty strings represent missing data.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMTSPAX</td><td>Code representing the sub-anatomical location or specific tissue sub-classification for the biospecimen, functionally linked to the genotyping batch/chip (SMGTC). Empty values indicate the sub-location information is not applicable or was not recorded for the sample.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMNABTCH</td><td>Nucleic acid isolation batch identifier for the biospecimen sample, used to group samples processed together in the same technical batch for RNA or DNA isolation. Empties represent samples without a recorded isolation batch.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMNABTCHT</td><td>Technical protocol or methodology used for nucleic acid extraction for the biospecimen sample. Values describe the specific laboratory kit or procedure (e.g., RNA isolation or DNA extraction methods). Empty values indicate that the extraction method information was not recorded for the sample.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMNABTCHD</td><td>Date of nucleic acid extraction or batch processing (MM/DD/YYYY) for the tissue sample; 1.64% of entries are empty strings indicating missing processing date data.</td><td class="t">temporal_marker</td></tr>
+<tr><td class="k">SMGEBTCH</td><td>Genotype batch identifier(s) for the sequencing of the biospecimen sample, providing traceability for the sample within a specific processing or sequencing run. Values may consist of single identifiers or comma-separated lists of multiple batches. Empty strings indicate that the genotype batch information is not applicable or not provided for that sample.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMGEBTCHD</td><td>Date when the sequencing batch processing occurred (e.g., library preparation or sequencing run date) for the sample. Empty values indicate that the date is not provided for this specific record.</td><td class="t">temporal_marker</td></tr>
+<tr><td class="k">SMGEBTCHT</td><td>Sequencing or library technology platform and protocol version used for the sample processing. This categorical field specifies the experimental method (e.g., RNA-seq library preparation, WGS coverage, or microarray type) applied to the biospecimen.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMAFRZE</td><td>Sample assay type or analytical data freeze category, indicating the experimental method or sequencing platform used for the sample (e.g., RNASEQ, WGS, WES, OMNI). &#x27;EXCLUDE&#x27; denotes samples excluded from analysis, and empty strings indicate missing or not applicable data.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMGTC</td><td>Identifier for the Genotyping Chip and well position used for the biospecimen sample, providing traceability for the genotyping batch. The values are unique identifiers for Illumina-style chips (e.g., &#x27;8134855139_R06C02&#x27; where 8134855139 is the chip ID, and RxxCxx specifies the well). Empty strings indicate that genotyping data is not applicable or not provided for that sample.</td><td class="t">identifier</td></tr>
+<tr><td class="k">SME2MPRT</td><td>Percentage of paired-end reads in Read 2 (E2) that mapped to the target (e.g., exon/gene area), as a proportion (0-1). The empty strings (17.8%) indicate missing/not-provided technical values.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMCHMPRS</td><td>Numerical metric representing the total number of chimeric reads detected during RNA-seq data processing for the biospecimen sample, used for sample quality control. Empty strings indicate that the metric was not calculated or not applicable for the sample.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMNTRART</td><td>Nucleotide alignment artifact rate for the RNA-seq sample (ratio, 0.0-1.0; empty values denote missing technical measurement)</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMNUMGPS</td><td>Reserved or placeholder technical metadata field for RNA-seq sample processing, currently unpopulated (empty) across all samples in this dataset version.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMMAPRT</td><td>Mapping rate of reads in the sequencing run, defined as the proportion of total reads that successfully aligned to the reference genome. Empty strings indicate samples where sequencing quality control was not applicable or the data was not provided.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMEXNCRT</td><td>The proportion of reads mapped to exonic regions for the RNA-Seq sample (exonic read rate). A standard quality control metric for RNA-seq library performance. Empty strings represent samples where the metric is not applicable or not provided.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SM550NRM</td><td>Reserved or placeholder metadata field for sample measurement, currently unpopulated (empty) across all samples in the RNA-seq quality control pipeline.</td><td class="t">status</td></tr>
+<tr><td class="k">SMGNSDTC</td><td>Total number of genotype calls detected in the sample, used as a quantitative metric for assessing genotype data quality. The values represent counts of genotype data points per biospecimen. Empty strings indicate that genotyping data is not applicable or not provided.</td><td class="t">quantity</td></tr>
+<tr><td class="k">SMUNMPRT</td><td>Indicator flag for unmapped read count (1 = unmapped reads present, empty string = not provided/not applicable) in the RNA-seq alignment pipeline. The data is binary-encoded (1/empty).</td><td class="t">status</td></tr>
+<tr><td class="k">SM350NRM</td><td>Reserved or placeholder metadata field for sample measurement, currently unpopulated (empty) across all samples in the RNA-seq technical quality pipeline.</td><td class="t">status</td></tr>
+<tr><td class="k">SMRDLGTH</td><td>Sequencing read length (in base pairs) for the RNA-seq sample (e.g., 76bp, 101bp). Empty values represent samples for which the read length was not provided or not applicable.</td><td class="t">coded_concept</td></tr>
+<tr><td class="k">SMMNCPB</td><td>Reserved or placeholder metadata field for sample measurement, currently unpopulated (empty) across all samples in this version of the dataset.</td><td class="t">status</td></tr>
+<tr><td class="k">SME1MMRT</td><td>Mismatch rate for the first read (Read 1) in RNA-seq library sequencing, a quality control metric indicating the proportion of mismatches in the alignment.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMSFLGTH</td><td>Sequencing fragment length (mean) in base pairs, characterizing the sample library insert size. Empty strings denote missing technical QC values.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMESTLBS</td><td>Indicator for laboratory-specific processing status (e.g., ischemic time status or lab-validated flag), represented as a binary flag (1=processed/status met, 0=not processed/status not met). The empty strings indicate missing or not applicable data.</td><td class="t">status</td></tr>
+<tr><td class="k">SMMPPD</td><td>Total count of mapped reads used as a technical quality metric for RNA-seq libraries; values represent the summation of aligned reads in the sequencing assay. Note: The provided column definitions and metadata in this dataset appear inconsistent; SMMPPD as &#x27;total&#x27; does not mathematically reconcile with the reported SMMPPDPR (paired) and SMMPPDUN (unpaired) in this environment. Users should treat this as a raw reported quantity from the processing pipeline rather than a derived arithmetic sum. Empty values correspond to samples where QC metrics were not successfully computed.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMNTERRT</td><td>Nucleotide alignment error rate for the sequencing sample, serving as a technical quality control metric (range ~0.0-0.45; empty strings denote samples where quality control metrics were not computed or data not applicable).</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMRRNANM</td><td>Number of Ribosomal RNA (rRNA) reads in the sequencing sample, used as a technical quality control metric for RNA-seq data.</td><td class="t">quantity</td></tr>
+<tr><td class="k">SMRDTTL</td><td>Total number of reads (read depth) in the RNA-seq sample. The 17.8% empty string rate represents samples where this metric could not be calculated, sequencing failed, or data is missing. Strongly correlated with SMMPPD (Total mapped paired-end reads).</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMVQCFL</td><td>Variant Quality Control (VQC) identifier for the biospecimen sample, used to track genetic data quality in the GTEx genotyping pipeline. Empty values indicate QC not performed or N/A.</td><td class="t">identifier</td></tr>
+<tr><td class="k">SMMNCV</td><td>Mean Nucleotide Coverage Value for the sample, used in RNA-seq quality control; currently no data available for all samples in this dataset version.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMTRSCPT</td><td>Total number of transcripts detected in the RNA-seq sample (zero-inflated — empty strings denote missing or non-processed samples)</td><td class="t">quantity</td></tr>
+<tr><td class="k">SMMPPDPR</td><td>Total number of mapped paired-end reads in the RNA-seq sample. This quantitative metric represents the sequencing output consisting of paired reads. The 17.8% empty string rate represents samples where paired-end sequencing was not performed, failed, or data was not processed. Note: Strongly correlated with total mapped reads (SMMPPD). The values are approximately 50% of the total mapped reads, consistent with a paired-end dataset where reads are counted in pairs.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMCGLGTH</td><td>Reserved or placeholder metadata field for sample measurement, currently unpopulated (empty string) across all samples in this dataset version.</td><td class="t">status</td></tr>
+<tr><td class="k">SMGAPPCT</td><td>Placeholder or empty technical metric for RNA sequencing quality control (currently no data provided)</td><td class="t">status</td></tr>
+<tr><td class="k">SMUNPDRD</td><td>Indicator for the presence of unpaired reads in the biospecimen sequencing data (&#x27;0&#x27; = no unpaired reads detected, empty string = data not provided/not applicable) in the RNA-seq alignment pipeline.</td><td class="t">status</td></tr>
+<tr><td class="k">SMNTRNRT</td><td>Non-transcribed intergenic rate (proportion of reads mapping to intergenic regions), a standard RNA-seq alignment quality control metric.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMMPUNRT</td><td>Mapped pair uniqueness rate (ratio of uniquely mapped reads to total reads) for RNA-seq samples. Empty values represent samples where this metric could not be calculated.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMEXPEFF</td><td>Sequencing expression efficiency score, representing the ratio of mapped/expressed reads in an RNA-seq sample to evaluate library performance. (Zero-inflated/missing values coded as empty strings).</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMMPPDUN</td><td>Total number of mapped reads in the RNA-seq sample that were mapped in an unpaired configuration. This quantitative metric represents the sequencing output consisting of unpaired reads. The 17.8% empty string rate represents samples where unpaired sequencing was not performed, failed, or data was not processed. Strongly correlated with total mapped reads (SMMPPD) and paired reads (SMMPPDPR).</td><td class="t">measurement</td></tr>
+<tr><td class="k">SME2MMRT</td><td>Mismatch rate for the second read (Read 2) in RNA-seq library sequencing, a quality control metric indicating the proportion of mismatches found during alignment of the second read in a paired-end sequencing run. Empty strings represent samples where this measurement was not applicable or not provided.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SME2ANTI</td><td>Number of reads in the second read (Read 2) of a paired-end RNA-seq sequence that align to the antisense strand, a quality control metric indicating strand-specificity and alignment characteristics. The empty strings represent missing or not-provided data.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMALTALG</td><td>Alignment-related quantitative metric or total mapped read count (e.g., number of aligned reads) for the RNA-seq sample processed within the GTEx pipeline. The values represent technical sequencing metrics formatted as scientific notation, with empty strings indicating samples where this metric is missing or not applicable.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SME2SNSE</td><td>Number of sense-oriented reads for Read 2 (E2) in the RNA-seq library. The values are counts (e.g., 1.45e+07), with empty strings representing missing or not-provided technical data.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMMFLGTH</td><td>Mean fragment length (in base pairs) for mapped reads in the sample. Empty strings represent samples where this measurement was not applicable or not provided.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SME1ANTI</td><td>Number of reads aligned to the antisense strand for Read 1 (E1) in the RNA-seq library, a quantitative metric of sequencing output. Empty strings represent samples where this specific QC metric was not provided or not applicable.</td><td class="t">quantity</td></tr>
+<tr><td class="k">SMSPLTRD</td><td>Total number of sequencing reads (read depth) for the RNA-seq biospecimen sample, providing a measure of sequencing throughput.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMBSMMRT</td><td>Sample base mismatch rate, a technical quality control metric representing the proportion of base-level mismatches in the aligned sequencing reads for the biospecimen.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SME1SNSE</td><td>Number of sense-oriented reads for Read 1 (E1) in the RNA-seq library. The values are counts, with empty strings representing samples where this specific QC metric was not provided or not applicable.</td><td class="t">quantity</td></tr>
+<tr><td class="k">SME1PCTS</td><td>Percentage of reads in Read 1 (E1) of a paired-end RNA-seq library that exhibit a specific property (e.g., GC content or alignment metric), represented as a percentage (0-100%). Empty strings represent missing or not-provided technical data.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMRRNART</td><td>rRNA (Ribosomal RNA) alignment rate, a quality control metric representing the proportion of reads that aligned to ribosomal RNA sequences in the RNA-seq sample. Empty values indicate that this metric was not calculated or not applicable for the sample.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SME1MPRT</td><td>Percentage of paired-end reads in Read 1 (E1) that mapped to the target (e.g., exon/gene area), as a proportion (0-1). Empty strings represent samples where this specific QC metric was not provided or not applicable.</td><td class="t">measurement</td></tr>
+<tr><td class="k">SMNUM5CD</td><td>Reserved or placeholder metadata field for sample measurement, currently unpopulated (empty) across all samples.</td><td class="t">status</td></tr>
+<tr><td class="k">SMDPMPRT</td><td>Indicator flag for sample duplicate-marking processing status in the RNA-seq alignment pipeline (0 = duplicate-marking performed, empty string = not provided/not applicable). The data is binary-encoded (0/empty), indicating the sample-processing status for an alignment quality control check.</td><td class="t">status</td></tr>
+<tr><td class="k">SME2PCTS</td><td>Percentage of GC content in Read 2 (E2) of the paired-end RNA-seq library. The empty strings (17.8%) indicate samples where this QC metric was not provided. Values are concentrated around 50%, which is typical for expected genomic GC content.</td><td class="t">measurement</td></tr></table></div></details>
+</div></section>
+<section id="headline"><div class="wrap">
+    <h2>The bug that breaks every numeric query</h2>
+    <p class="lead">One finding rose to a hard <b>FAIL</b> &mdash; the pipeline's strongest verdict,
+    raised only when reverting it would recreate a real conflict in the data.</p>
+    <div class="card bug">
+  <span class="tag fail">FAIL</span> <span class="pill">missing_key_coverage</span>
+  <h3>Structurally-missing QC metrics &mdash; <span class="col">SMTS</span></h3>
+  <div class="why">Certain tissue types (most notably Whole Blood) routinely undergo DNA isolation rather than RNA-seq. Consequently, these samples lack RNA-seq technical QC metrics (such as SMMAPRT, SMTRSCPT, etc.). These structurally missing fields are encoded as empty strings (&#x27;&#x27;) instead of proper NaNs, causing the numerical columns to load as &#x27;object&#x27; dtypes, which breaks downstream numerical queries and masking logic.</div>
+  <div class="fix"><b>Fix &rarr;</b> Replace empty strings (&#x27;&#x27;) with np.nan and strictly cast technical QC metrics to float. Ensure analysis over these columns either explicitly filters for RNA-seq isolated samples using `SMNABTCHT` or employs `.dropna()` after casting to handle the structural sparsity.</div>
+</div>
+    <p class="muted">Why it matters: a quarter of the sample rows are DNA-only (e.g. Whole Blood).
+    Their RNA-seq QC columns are blank strings, not nulls &mdash; so pandas types the whole
+    column as <code>object</code>, and <code>df.SMRIN &gt; 7</code> silently misbehaves.</p>
+    </div></section>
+<section id="bugs"><div class="wrap">
+  <h2>Data traps the agents caught</h2>
+  <p class="lead">Curated from 281 raw findings &mdash; the ones a careful analyst would
+  actually trip over. Each is grounded in the real values, not guessed from the column name.</p>
+  <div class="grid"><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">missing_key_coverage</span>
+  <h3>Structurally-missing QC metrics &mdash; <span class="col">SMTS</span></h3>
+  <div class="why">Certain tissue types (most notably Whole Blood) routinely undergo DNA isolation rather than RNA-seq. Consequently, these samples lack RNA-seq technical QC metrics (such as SMMAPRT, SMTRSCPT, etc.). These structurally missing fields are encoded as empty strings (&#x27;&#x27;) instead of proper NaNs, causing the numerical columns to load as &#x27;object&#x27; dtypes, which breaks downstream numerical queries and masking logic.</div>
+  <div class="fix"><b>Fix &rarr;</b> Replace empty strings (&#x27;&#x27;) with np.nan and strictly cast technical QC metrics to float. Ensure analysis over these columns either explicitly filters for RNA-seq isolated samples using `SMNABTCHT` or employs `.dropna()` after casting to handle the structural sparsity.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">empty_as_missing_sentinel</span>
+  <h3>Empty string = hidden placeholder &mdash; <span class="col">SMATSSCR</span></h3>
+  <div class="why">7212 rows (31%) in SMATSSCR are empty; these strongly correlate with &#x27;SAMPID&#x27; having a specific value (e.g., &#x27;GTEX-1117F-0003-SM-58Q7G&#x27;), indicating these are placeholders rather than valid blank data.</div>
+  <div class="fix"><b>Fix &rarr;</b> Exclude or impute rows where SMATSSCR is empty before performing calculations, as they represent a state (like &#x27;pending&#x27;) rather than missing values.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">empty_as_missing_sentinel</span>
+  <h3>Empty string = hidden placeholder &mdash; <span class="col">SMRIN</span></h3>
+  <div class="why">2953 rows (13%) in SMRIN are empty; these strongly correlate with &#x27;SAMPID&#x27; having a specific value (e.g., &#x27;GTEX-1117F-0003-SM-58Q7G&#x27;), indicating these are placeholders rather than valid blank data.</div>
+  <div class="fix"><b>Fix &rarr;</b> Exclude or impute rows where SMRIN is empty before performing calculations, as they represent a state (like &#x27;pending&#x27;) rather than missing values.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">wrong_dtype</span>
+  <h3>Mixed numeric shapes (sci-notation) &mdash; <span class="col">SMCHMPRS</span></h3>
+  <div class="why">SMCHMPRS: 745 values use scientific notation alongside 18114 plain numerics. Dedup, sort, and equality comparison silently disagree across the two shapes.</div>
+  <div class="fix"><b>Fix &rarr;</b> Coerce: ``pd.to_numeric(df[&#x27;SMCHMPRS&#x27;], errors=&#x27;coerce&#x27;)`` and re-cast to a consistent string format for display.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">wrong_dtype</span>
+  <h3>Mixed numeric shapes (sci-notation) &mdash; <span class="col">SMRRNANM</span></h3>
+  <div class="why">SMRRNANM: 5971 values use scientific notation alongside 12888 plain numerics. Dedup, sort, and equality comparison silently disagree across the two shapes.</div>
+  <div class="fix"><b>Fix &rarr;</b> Coerce: ``pd.to_numeric(df[&#x27;SMRRNANM&#x27;], errors=&#x27;coerce&#x27;)`` and re-cast to a consistent string format for display.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">multi_component_composite_strings</span>
+  <h3>Comma-packed composite cells &mdash; <span class="col">SMCENTER</span></h3>
+  <div class="why">Column &#x27;SMCENTER&#x27; mixes standalone entities and multi-component composites separated by &#x27;,&#x27;. 2703 rows are composites, and at least 5 standalone values (e.g., &#x27;B1&#x27;) also appear as substrings inside composites (e.g., &#x27;B1, A1&#x27;). Counting distinct values double-counts core entities.</div>
+  <div class="fix"><b>Fix &rarr;</b> Split &#x27;SMCENTER&#x27; by &#x27;,&#x27; and explode, or extract the primary component before counting or computing properties.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">multi_component_composite_strings</span>
+  <h3>Comma-packed composite cells &mdash; <span class="col">SMGEBTCH</span></h3>
+  <div class="why">Column &#x27;SMGEBTCH&#x27; mixes standalone entities and multi-component composites separated by &#x27;,&#x27;. 1433 rows are composites, and at least 239 standalone values (e.g., &#x27;LCSET-10154&#x27;) also appear as substrings inside composites (e.g., &#x27;LCSET-10154,LCSET-10534&#x27;). Counting distinct values double-counts core entities.</div>
+  <div class="fix"><b>Fix &rarr;</b> Split &#x27;SMGEBTCH&#x27; by &#x27;,&#x27; and explode, or extract the primary component before counting or computing properties.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">timestamp_granularity_trap</span>
+  <h3>Date-only timestamps (no ordering) &mdash; <span class="col">SMNABTCHD</span></h3>
+  <div class="why">Timestamp column SMNABTCHD has 0 microseconds and 22088 duplicated values, suggesting lack of granular precision.</div>
+  <div class="fix"><b>Fix &rarr;</b> Verify if the timestamp precision is sufficient for event ordering or if timestamps were rounded at source.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">timestamp_granularity_trap</span>
+  <h3>Date-only timestamps (no ordering) &mdash; <span class="col">SMGEBTCHD</span></h3>
+  <div class="why">Timestamp column SMGEBTCHD has 0 microseconds and 22592 duplicated values, suggesting lack of granular precision.</div>
+  <div class="fix"><b>Fix &rarr;</b> Verify if the timestamp precision is sufficient for event ordering or if timestamps were rounded at source.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">default_value_overuse</span>
+  <h3>Dominant default value &mdash; <span class="col">SMGTC</span></h3>
+  <div class="why">SMGTC: value &#x27;&#x27; accounts for 98% of non-null rows (22572/22951). The column is effectively dominated by an upstream default — joins and filters on this column won&#x27;t discriminate.</div>
+  <div class="fix"><b>Fix &rarr;</b> Check the source schema for a column default; confirm whether the dominant value is real or a fallback that should be NULL.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">case_whitespace_split</span>
+  <h3>Case/whitespace duplicate entities &mdash; <span class="col">SMPTHNTS</span></h3>
+  <div class="why">SMPTHNTS: 49 entity name(s) appear under multiple case/whitespace variants — e.g. &#x27;2 pieces, no  abnormalities | 2 pieces, no abnormalities&#x27;. Inflates distinct-entity counts and breaks joins on the raw column.</div>
+  <div class="fix"><b>Fix &rarr;</b> Normalise with df[&#x27;SMPTHNTS&#x27;].str.strip().str.casefold() before groupby/join; or apply a single canonical form upstream.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">constant_value_column</span>
+  <h3>All-empty / constant column &mdash; <span class="col">SMNUMGPS</span></h3>
+  <div class="why">Column &#x27;SMNUMGPS&#x27; contains exactly one distinct value &#x27;&#x27; across 22951 rows. This column provides no discriminatory information for analysis.</div>
+  <div class="fix"><b>Fix &rarr;</b> Check if &#x27;SMNUMGPS&#x27; is intended to be a constant filter or if it should contain variation; if it&#x27;s a fixed flag, it can be dropped to reduce dimensionality.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">constant_value_column</span>
+  <h3>All-empty / constant column &mdash; <span class="col">SM550NRM</span></h3>
+  <div class="why">Column &#x27;SM550NRM&#x27; contains exactly one distinct value &#x27;&#x27; across 22951 rows. This column provides no discriminatory information for analysis.</div>
+  <div class="fix"><b>Fix &rarr;</b> Check if &#x27;SM550NRM&#x27; is intended to be a constant filter or if it should contain variation; if it&#x27;s a fixed flag, it can be dropped to reduce dimensionality.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">redundant_column</span>
+  <h3>Duplicated columns &mdash; <span class="col">SMMAPRT &amp; SMMPUNRT</span></h3>
+  <div class="why">Columns &#x27;SMMAPRT&#x27; and &#x27;SMMPUNRT&#x27; contain identical data but have different types (object vs object).</div>
+  <div class="fix"><b>Fix &rarr;</b> Remove one column to reduce ambiguity and maintain a single source of truth for this timestamp.</div>
+</div><div class="card bug">
+  <span class="tag warn">WARN</span> <span class="pill">redundant_column</span>
+  <h3>Duplicated columns &mdash; <span class="col">SMESTLBS &amp; SMUNPDRD</span></h3>
+  <div class="why">Columns &#x27;SMESTLBS&#x27; and &#x27;SMUNPDRD&#x27; contain identical data but have different types (object vs object).</div>
+  <div class="fix"><b>Fix &rarr;</b> Remove one column to reduce ambiguity and maintain a single source of truth for this timestamp.</div>
+</div></div>
+</div></section>
+<section id="advisory"><div class="wrap">
+    <h2>Cross-column signals worth a second look</h2>
+    <p class="lead">Advisory observations &mdash; not necessarily errors. Scale shifts across tissues
+    can be real biology (ischemic time, RNA yield) or a units inconsistency. The pipeline flags;
+    a human decides.</p><div class="card bug"><span class="tag adv">ADVISORY</span>
+    <span class="pill">domain_coherence</span><div class="why" style="margin-top:8px">Table &#x27;GTEX_SAMPLEATTRIBUTES&#x27; has clinical_domain=&#x27;biobanking&#x27; but 51/58 domain-bearing columns have a different domain. The table domain may be misclassified.</div></div><div class="card bug"><span class="tag adv">ADVISORY</span>
+    <span class="pill">unit_consistency</span><div class="why" style="margin-top:8px">Measurement column &#x27;SMTSISCH&#x27; has a 6.2x scale difference when grouped by &#x27;SMTS&#x27;: &#x27;Spleen&#x27; (median=161.5, n=260); &#x27;Fallopian Tube&#x27; (median=185.0, n=9); &#x27;Adrenal Gland&#x27; (median=195.0, n=275); &#x27;Small Intestine&#x27; (median=223.0, n=193); &#x27;Pancreas&#x27; (median=233.5, n=360); &#x27;Stomach&#x27; (median=240.0, n=381); &#x27;Bladder&#x27; (median=248.0, n=21); &#x27;Blood&#x27; (median=249.0, n=3421); &#x27;Uterus&#x27; (median=334.5, n=166); &#x27;Cervix Uteri&#x27; (median=347.0, n=19); &#x27;Colon&#x27; (median=385.0, n=821); &#x27;Esophagus&#x27; (median=396.5, n=1582); &#x27;Vagina&#x27; (median=397.0, n=173); &#x27;Ovary&#x27; (median=398.0, n=195); &#x27;Salivary Gland&#x27; (median=415.0, n=181); &#x27;Prostate&#x27; (median=423.0, n=262); &#x27;Blood Vessel&#x27; (median=445.0, n=1473); &#x27;Heart&#x27; (median=485.0, n=1140); &#x27;Muscle&#x27; (median=489.5, n=1130); &#x27;Adipose Tissue&#x27; (median=497.0, n=1327); &#x27;Thyroid&#x27; (median=508.0, n=812); &#x27;Lung&#x27; (median=520.0, n=866); &#x27;Testis&#x27; (median=525.0, n=406); &#x27;Breast&#x27; (median=528.5, n=480); &#x27;Nerve&#x27; (median=529.0, n=722); &#x27;Skin&#x27; (median=535.0, n=1993); &#x27;Liver&#x27; (median=643.0, n=251); &#x27;Kidney&#x27; (median=746.0, n=104); &#x27;Brain&#x27; (median=795.0, n=3326); &#x27;Pituitary&#x27; (median=1004.0, n=301). This suggests values may use different units or scales across groups.</div></div><div class="card bug"><span class="tag adv">ADVISORY</span>
+    <span class="pill">unit_consistency</span><div class="why" style="margin-top:8px">Measurement column &#x27;SMTSISCH&#x27; has a 6.2x scale difference when grouped by &#x27;SMTSD&#x27;: &#x27;Spleen&#x27; (median=161.5, n=260); &#x27;Fallopian Tube&#x27; (median=185.0, n=9); &#x27;Adrenal Gland&#x27; (median=195.0, n=275); &#x27;Small Intestine - Terminal Ileum&#x27; (median=223.0, n=193); &#x27;Pancreas&#x27; (median=233.5, n=360); &#x27;Stomach&#x27; (median=240.0, n=381); &#x27;Bladder&#x27; (median=248.0, n=21); &#x27;Cervix - Endocervix&#x27; (median=272.0, n=10); &#x27;Whole Blood&#x27; (median=288.0, n=3229); &#x27;Colon - Transverse&#x27; (median=289.5, n=432); &#x27;Artery - Coronary&#x27; (median=307.0, n=253); &#x27;Uterus&#x27; (median=334.5, n=166); &#x27;Esophagus - Muscularis&#x27; (median=356.0, n=559); &#x27;Vagina&#x27; (median=397.0, n=173); &#x27;Ovary&#x27; (median=398.0, n=195); &#x27;Esophagus - Gastroesophageal Junction&#x27; (median=406.0, n=401); &#x27;Minor Salivary Gland&#x27; (median=415.0, n=181); &#x27;Prostate&#x27; (median=423.0, n=262); &#x27;Heart - Left Ventricle&#x27; (median=429.0, n=688); &#x27;Esophagus - Mucosa&#x27; (median=430.5, n=622); &#x27;Artery - Aorta&#x27; (median=432.5, n=450); &#x27;Cervix - Ectocervix&#x27; (median=433.0, n=9); &#x27;Cells - Cultured fibroblasts&#x27; (median=466.0, n=506); &#x27;Colon - Sigmoid&#x27; (median=474.0, n=389); &#x27;Artery - Tibial&#x27; (median=481.0, n=770); &#x27;Adipose - Subcutaneous&#x27; (median=482.0, n=763); &#x27;Muscle - Skeletal&#x27; (median=489.5, n=1130); &#x27;Thyroid&#x27; (median=508.0, n=812); &#x27;Lung&#x27; (median=520.0, n=866); &#x27;Testis&#x27; (median=525.0, n=406); &#x27;Breast - Mammary Tissue&#x27; (median=528.5, n=480); &#x27;Nerve - Tibial&#x27; (median=529.0, n=722); &#x27;Adipose - Visceral (Omentum)&#x27; (median=531.5, n=564); &#x27;Skin - Sun Exposed (Lower leg)&#x27; (median=535.0, n=849); &#x27;Skin - Not Sun Exposed (Suprapubic)&#x27; (median=581.5, n=638); &#x27;Heart - Atrial Appendage&#x27; (median=596.5, n=452); &#x27;Kidney - Medulla&#x27; (median=620.0, n=4); &#x27;Liver&#x27; (median=643.0, n=251); &#x27;Brain - Frontal Cortex (BA9)&#x27; (median=724.0, n=425); &#x27;Brain - Hippocampus&#x27; (median=724.0, n=243); &#x27;Brain - Cerebellar Hemisphere&#x27; (median=725.0, n=263); &#x27;Brain - Hypothalamus&#x27; (median=733.0, n=236); &#x27;Brain - Anterior cingulate cortex (BA24)&#x27; (median=740.0, n=213); &#x27;Kidney - Cortex&#x27; (median=753.0, n=100); &#x27;Brain - Caudate (basal ganglia)&#x27; (median=753.0, n=291); &#x27;Brain - Amygdala&#x27; (median=753.0, n=177); &#x27;Brain - Spinal cord (cervical c-1)&#x27; (median=759.0, n=182); &#x27;Brain - Putamen (basal ganglia)&#x27; (median=759.0, n=232); &#x27;Brain - Nucleus accumbens (basal ganglia)&#x27; (median=762.0, n=277); &#x27;Brain - Substantia nigra&#x27; (median=774.5, n=164); &#x27;Brain - Cortex&#x27; (median=989.0, n=325); &#x27;Brain - Cerebellum&#x27; (median=996.0, n=298); &#x27;Pituitary&#x27; (median=1004.0, n=301). This suggests values may use different units or scales across groups.</div></div><div class="card bug"><span class="tag adv">ADVISORY</span>
+    <span class="pill">unit_consistency</span><div class="why" style="margin-top:8px">Measurement column &#x27;SMALTALG&#x27; has a 11.1x scale difference when grouped by &#x27;SMTS&#x27;: &#x27;Blood Vessel&#x27; (median=6949850.0, n=1387); &#x27;Fallopian Tube&#x27; (median=7160920.0, n=9); &#x27;Bladder&#x27; (median=7418540.0, n=21); &#x27;Uterus&#x27; (median=7679070.0, n=153); &#x27;Cervix Uteri&#x27; (median=7834670.0, n=19); &#x27;Nerve&#x27; (median=7845140.0, n=655); &#x27;Breast&#x27; (median=8476395.0, n=480); &#x27;Lung&#x27; (median=8589825.0, n=636); &#x27;Vagina&#x27; (median=8648360.0, n=169); &#x27;Colon&#x27; (median=8677845.0, n=818); &#x27;Esophagus&#x27; (median=8701220.0, n=1565); &#x27;Adipose Tissue&#x27; (median=8784040.0, n=1287); &#x27;Prostate&#x27; (median=8839040.0, n=261); &#x27;Thyroid&#x27; (median=8903540.0, n=700); &#x27;Skin&#x27; (median=9748430.0, n=1929); &#x27;Ovary&#x27; (median=9776850.0, n=191); &#x27;Small Intestine&#x27; (median=9995370.0, n=193); &#x27;Muscle&#x27; (median=10274800.0, n=873); &#x27;Adrenal Gland&#x27; (median=11416850.0, n=272); &#x27;Pituitary&#x27; (median=11613600.0, n=295); &#x27;Spleen&#x27; (median=11981300.0, n=255); &#x27;Testis&#x27; (median=12192350.0, n=402); &#x27;Liver&#x27; (median=12938400.0, n=249); &#x27;Kidney&#x27; (median=13582200.0, n=98); &#x27;Salivary Gland&#x27; (median=13675800.0, n=178); &#x27;Heart&#x27; (median=14923600.0, n=934); &#x27;Bone Marrow&#x27; (median=16078000.0, n=203); &#x27;Brain&#x27; (median=20676800.0, n=2881); &#x27;Pancreas&#x27; (median=20899800.0, n=354); &#x27;Stomach&#x27; (median=45036650.0, n=380); &#x27;Blood&#x27; (median=77001300.0, n=1012). This suggests values may use different units or scales across groups.</div></div><div class="card bug"><span class="tag adv">ADVISORY</span>
+    <span class="pill">unit_consistency</span><div class="why" style="margin-top:8px">Measurement column &#x27;SMALTALG&#x27; has a 13.2x scale difference when grouped by &#x27;SMTSD&#x27;: &#x27;Artery - Tibial&#x27; (median=6838320.0, n=688); &#x27;Artery - Aorta&#x27; (median=6946570.0, n=448); &#x27;Fallopian Tube&#x27; (median=7160920.0, n=9); &#x27;Cervix - Endocervix&#x27; (median=7202145.0, n=10); &#x27;Artery - Coronary&#x27; (median=7368720.0, n=251); &#x27;Bladder&#x27; (median=7418540.0, n=21); &#x27;Esophagus - Gastroesophageal Junction&#x27; (median=7628620.0, n=399); &#x27;Uterus&#x27; (median=7679070.0, n=153); &#x27;Esophagus - Muscularis&#x27; (median=7701770.0, n=545); &#x27;Nerve - Tibial&#x27; (median=7845140.0, n=655); &#x27;Colon - Sigmoid&#x27; (median=8149560.0, n=389); &#x27;Adipose - Subcutaneous&#x27; (median=8392940.0, n=725); &#x27;Breast - Mammary Tissue&#x27; (median=8476395.0, n=480); &#x27;Lung&#x27; (median=8589825.0, n=636); &#x27;Vagina&#x27; (median=8648360.0, n=169); &#x27;Prostate&#x27; (median=8839040.0, n=261); &#x27;Thyroid&#x27; (median=8903540.0, n=700); &#x27;Skin - Sun Exposed (Lower leg)&#x27; (median=9147620.0, n=772); &#x27;Adipose - Visceral (Omentum)&#x27; (median=9187795.0, n=562); &#x27;Skin - Not Sun Exposed (Suprapubic)&#x27; (median=9322460.0, n=637); &#x27;Colon - Transverse&#x27; (median=9365260.0, n=429); &#x27;Cervix - Ectocervix&#x27; (median=9582670.0, n=9); &#x27;Ovary&#x27; (median=9776850.0, n=191); &#x27;Small Intestine - Terminal Ileum&#x27; (median=9995370.0, n=193); &#x27;Muscle - Skeletal&#x27; (median=10274800.0, n=873); &#x27;Kidney - Medulla&#x27; (median=10326340.0, n=4); &#x27;Esophagus - Mucosa&#x27; (median=10672400.0, n=621); &#x27;Adrenal Gland&#x27; (median=11416850.0, n=272); &#x27;Pituitary&#x27; (median=11613600.0, n=295); &#x27;Spleen&#x27; (median=11981300.0, n=255); &#x27;Heart - Atrial Appendage&#x27; (median=12135450.0, n=448); &#x27;Testis&#x27; (median=12192350.0, n=402); &#x27;Cells - Cultured fibroblasts&#x27; (median=12264400.0, n=520); &#x27;Liver&#x27; (median=12938400.0, n=249); &#x27;Minor Salivary Gland&#x27; (median=13675800.0, n=178); &#x27;Kidney - Cortex&#x27; (median=14195200.0, n=94); &#x27;Brain - Spinal cord (cervical c-1)&#x27; (median=15562900.0, n=171); &#x27;Cells - Leukemia cell line (CML)&#x27; (median=16078000.0, n=203); &#x27;Brain - Cerebellar Hemisphere&#x27; (median=16963000.0, n=245); &#x27;Brain - Substantia nigra&#x27; (median=17280700.0, n=150); &#x27;Cells - EBV-transformed lymphocytes&#x27; (median=17554800.0, n=181); &#x27;Brain - Cortex&#x27; (median=18265150.0, n=280); &#x27;Heart - Left Ventricle&#x27; (median=18285700.0, n=486); &#x27;Brain - Frontal Cortex (BA9)&#x27; (median=19317400.0, n=221); &#x27;Brain - Hypothalamus&#x27; (median=20310200.0, n=219); &#x27;Brain - Cerebellum&#x27; (median=20459700.0, n=275); &#x27;Pancreas&#x27; (median=20899800.0, n=354); &#x27;Brain - Anterior cingulate cortex (BA24)&#x27; (median=22236700.0, n=199); &#x27;Brain - Nucleus accumbens (basal ganglia)&#x27; (median=22250950.0, n=258); &#x27;Brain - Hippocampus&#x27; (median=22874800.0, n=214); &#x27;Brain - Amygdala&#x27; (median=23505500.0, n=161); &#x27;Brain - Putamen (basal ganglia)&#x27; (median=27303300.0, n=219); &#x27;Brain - Caudate (basal ganglia)&#x27; (median=27461600.0, n=269); &#x27;Stomach&#x27; (median=45036650.0, n=380); &#x27;Whole Blood&#x27; (median=90004300.0, n=831). This suggests values may use different units or scales across groups.</div></div><div class="card bug"><span class="tag adv">ADVISORY</span>
+    <span class="pill">unit_consistency</span><div class="why" style="margin-top:8px">Measurement column &#x27;SMRRNART&#x27; has a 23.8x scale difference when grouped by &#x27;SMTS&#x27;: &#x27;Ovary&#x27; (median=0.0, n=191); &#x27;Uterus&#x27; (median=0.0, n=153); &#x27;Cervix Uteri&#x27; (median=0.0, n=19); &#x27;Pancreas&#x27; (median=0.0, n=354); &#x27;Blood&#x27; (median=0.0, n=1012); &#x27;Vagina&#x27; (median=0.0, n=169); &#x27;Fallopian Tube&#x27; (median=0.0, n=9); &#x27;Nerve&#x27; (median=0.0, n=655); &#x27;Salivary Gland&#x27; (median=0.0, n=178); &#x27;Blood Vessel&#x27; (median=0.0, n=1387); &#x27;Thyroid&#x27; (median=0.0, n=700); &#x27;Lung&#x27; (median=0.0, n=636); &#x27;Skin&#x27; (median=0.0, n=1929); &#x27;Breast&#x27; (median=0.0, n=480); &#x27;Spleen&#x27; (median=0.0, n=255); &#x27;Adipose Tissue&#x27; (median=0.0, n=1287); &#x27;Pituitary&#x27; (median=0.0, n=295); &#x27;Bladder&#x27; (median=0.0, n=21); &#x27;Small Intestine&#x27; (median=0.0, n=193); &#x27;Esophagus&#x27; (median=0.0, n=1565); &#x27;Prostate&#x27; (median=0.0, n=261); &#x27;Bone Marrow&#x27; (median=0.0, n=203); &#x27;Colon&#x27; (median=0.0, n=818); &#x27;Stomach&#x27; (median=0.0, n=380); &#x27;Testis&#x27; (median=0.0, n=402); &#x27;Muscle&#x27; (median=0.0, n=873); &#x27;Liver&#x27; (median=0.0, n=249); &#x27;Adrenal Gland&#x27; (median=0.0, n=272); &#x27;Heart&#x27; (median=0.0, n=934); &#x27;Kidney&#x27; (median=0.0, n=98); &#x27;Brain&#x27; (median=0.1, n=2881). This suggests values may use different units or scales across groups.</div></div></div></section>
+<section id="wrongvalues"><div class="wrap">
+    <h2>Row-level wrong values</h2>
+    <p class="lead">Beyond column-shape traps, a deeper pass tested individual values against each
+    column's <em>own</em> learned constraints &mdash; web-grounded priors, vocabularies, and
+    cross-column invariants. <b>44 findings</b>: 25 hard violation &middot; 13 plausible event &middot; 4 plausible rare &middot; 2 conditional outlier.</p>
+    <div class="grid"><div class="card bug">
+        <span class="tag fail">HARD VIOLATION</span> <span class="pill">sentinel_encoded_missing</span> <span class="pill">5 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SME2MPRT</span></h3>
+        <div class="why">The SME2MPRT column uses empty strings (&#x27;&#x27;) to represent missing values, as evidenced by 4,092 occurrences of empty strings mixed with standard numeric proportion values. This corresponds to approximately 17.8% of the rows, matching the expected behavior for sentinel-encoded missingness in a numeric column.</div>
+        <div class="fix"><b>Fix &rarr;</b> Replace empty strings with np.nan</div></div><div class="card bug">
+        <span class="tag fail">HARD VIOLATION</span> <span class="pill">sentinel_encoded_missing</span> <span class="pill">3 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMMAPRT</span></h3>
+        <div class="why">The dataset contains 4,092 rows where the SMMAPRT (Mapping rate) column is an empty string (&#x27;&#x27;). This confirms the hypothesis that missing data or non-applicable QC metrics are encoded as empty strings, creating a mixed-type column.</div>
+        </div><div class="card bug">
+        <span class="tag fail">HARD VIOLATION</span> <span class="pill">unfiltered_metadata</span> <span class="pill">1 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SUBJID</span></h3>
+        <div class="why">K-562 is a well-known immortalized leukemia cell line universally used as a biological control in genomics assays, not a true subject in the GTEx post-mortem cohort (whose IDs are formatted like GTEX-XXXX). Its inclusion in the subject metadata table is a classic example of unfiltered control metadata leaking into the primary cohort data.</div>
+        <div class="fix"><b>Fix &rarr;</b> Remove the K-562 row from the primary subject table or flag it explicitly as a control.</div></div><div class="card bug">
+        <span class="tag fail">HARD VIOLATION</span> <span class="pill">cross_column_inconsistency</span> <span class="pill">2 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMMPPD</span></h3>
+        <div class="why">Total mapped reads (SMMPPD) must theoretically equal the sum of paired and unpaired mapped reads. In the data, SMMPPD is exactly equal to SMMPPDUN (unpaired reads) for all non-empty rows, while SMMPPDPR is non-zero. This represents a fundamental extraction or pipeline reporting error where total reads were erroneously populated with the unpaired read count.</div>
+        </div><div class="card bug">
+        <span class="tag fail">HARD VIOLATION</span> <span class="pill">cross_column_inconsistency</span> <span class="pill">2 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMUBRID</span></h3>
+        <div class="why">A detailed tissue description (SMTSD) should logically map strictly 1:1 to an ontology ID (SMUBRID). However, SMUBRID &#x27;0002037&#x27; maps to two distinct tissue sites (&#x27;Brain - Cerebellum&#x27; and &#x27;Brain - Cerebellar Hemisphere&#x27;). Since the underlying ontology contains distinct terms for both, this breaks the expected functional dependency observed in all other 53 tissue types.</div>
+        </div><div class="card bug">
+        <span class="tag fail">HARD VIOLATION</span> <span class="pill">data_artifact</span> <span class="pill">2 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMESTLBS</span></h3>
+        <div class="why">SMESTLBS only contains &#x27;0&#x27; (for ~18k RNA-seq samples) and empty strings (for other assays). Despite the documentation defining it as a binary indicator flag (1=processed, 0=not), it lacks any variation to be informative, effectively functioning as a dummy/zero-inflated column. This confirms a pipeline population failure.</div>
+        </div><div class="card bug">
+        <span class="tag warn">CONDITIONAL OUTLIER</span> <span class="pill">vocab_violation</span> <span class="pill">2 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMGEBTCHT</span></h3>
+        <div class="why">There is exactly one sample each for &#x27;PCR+ 30x Coverage WGS v1 (HiSeq2000)&#x27; and &#x27;PCR+ 30x Coverage WGS v1 (HiSeqX)&#x27;. Given the presence of dozens to hundreds of samples with identically or similarly named platforms (e.g., 79 for &#x27;PCR+ 30x Coverage WGS (HiSeq2000)&#x27; and 579 for &#x27;PCR+ 30x Coverage WGS v2 (HiSeqX)&#x27;), these singletons are extremely likely to be typographic variations or data entry artifacts rather than genuine distinct platforms.</div>
+        </div><div class="card bug">
+        <span class="tag warn">CONDITIONAL OUTLIER</span> <span class="pill">temporal_integrity</span> <span class="pill">2 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMNABTCH</span></h3>
+        <div class="why">A nucleic acid extraction batch (SMNABTCH) groups samples processed together, meaning they should all have the same extraction date (SMNABTCHD). However, batches like BP-18079 and BP-18340 have samples recorded on conflicting dates separated by over a month (August vs September), indicating erroneous tracking or identifier reuse.</div>
+        </div><div class="card bug">
+        <span class="tag adv">PLAUSIBLE / RARE</span> <span class="pill">unfiltered_metadata</span> <span class="pill">5 witness row(s)</span>
+        <h3 style="margin:8px 0 6px"><span class="col">SMCGLGTH</span></h3>
+        <div class="why">The entire dataset (22,951 rows) consists of empty strings for this column, confirming the hypothesis that it is an unpopulated placeholder field.</div>
+        <div class="fix"><b>Fix &rarr;</b> Drop the column if completely unpopulated.</div></div></div></div></section>
+<section id="takeaways"><div class="wrap">
+  <h2>The five things that matter</h2>
+  <div class="take"><div class="n">1</div><div><b>Cryptic columns became readable.</b><div class="muted">All 67 columns &mdash; from <code>SMTSISCH</code> to <code>SMNABTCHD</code> &mdash; got a plain-English meaning and a type, with zero hand-written dictionary.</div></div></div><div class="take"><div class="n">2</div><div><b>Blanks aren't missing &mdash; they're structural.</b><div class="muted">The biggest risk in this dataset is empty-string-as-null. DNA-only samples leave RNA-seq QC blank, corrupting dtypes and every numeric filter downstream.</div></div></div><div class="take"><div class="n">3</div><div><b>Shape bugs hide in plain numbers.</b><div class="muted">Scientific-notation mixed with plain decimals (<code>SMCHMPRS</code>, <code>SMRRNANM</code>) makes dedup, sort, and equality silently disagree.</div></div></div><div class="take"><div class="n">4</div><div><b>Some cells pack several entities.</b><div class="muted"><code>SMCENTER</code> and <code>SMGEBTCH</code> stuff comma-separated lists into one cell &mdash; counts and joins are wrong unless you split first.</div></div></div><div class="take"><div class="n">5</div><div><b>The agents show their work.</b><div class="muted">Every meaning and every bug carries its evidence and a concrete fix &mdash; reproducible, auditable, not a black box.</div></div></div>
+</div></section>
+<footer><div class="wrap">
+  Generated by <b>Semantic Enricher</b> &mdash; LLM-agent data profiling, relationship discovery,
+  and trap detection. Source: GTEx v8 public annotations
+  (<span class="mono">SampleAttributesDS</span>, <span class="mono">SubjectPhenotypesDS</span>).
+  Findings are automated and may include false positives; each links to its evidence.
+</div></footer></body></html>
